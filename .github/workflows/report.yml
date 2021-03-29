@@ -1,0 +1,29 @@
+name: Auto Report
+on: 
+  schedule:
+    - cron: "15 0 * * *"
+  push:
+    branches: [main]
+
+jobs:
+
+  report:
+    name: auto report
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Build
+      run: |
+        curl -L -o auto-report https://github.com/hstable/auto-report/releases/latest/download/auto-report_linux_amd64
+        chmod +x auto-report
+        
+    - name: Run
+      env:
+        STUDENTID: ${{ secrets.STUDENTID }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+        EMAIL: ${{ secrets.EMAIL }}
+      run: |
+        if [[ -z $EMAIL ]]
+        then ./auto-report -u $STUDENTID -p $PASSWORD
+        else ./auto-report -u $STUDENTID -p $PASSWORD -e $EMAIL
+        fi
